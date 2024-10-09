@@ -6,7 +6,7 @@ const Feature = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div>
             <img
-              src="https://img.icons8.com/ios-filled/50/000000/server.png" // Replace with your icon
+              src="https://img.icons8.com/ios-filled/50/000000/server.png"
               alt="Resource Optimization"
               className="mx-auto mb-4"
             />
@@ -17,7 +17,7 @@ const Feature = () => {
           </div>
           <div>
             <img
-              src="https://img.icons8.com/ios-filled/50/000000/security-checked.png" // Replace with your icon
+              src="https://img.icons8.com/ios-filled/50/000000/security-checked.png"
               alt="Enhanced Security"
               className="mx-auto mb-4"
             />
@@ -28,7 +28,7 @@ const Feature = () => {
           </div>
           <div>
             <img
-              src="https://img.icons8.com/ios-filled/50/000000/combo-chart.png" // Replace with your icon
+              src="https://img.icons8.com/ios-filled/50/000000/combo-chart.png"
               alt="Real-time Monitoring"
               className="mx-auto mb-4"
             />
