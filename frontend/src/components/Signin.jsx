@@ -1,8 +1,9 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const SignIn = () => {
   return (
-    <div className="bg-gray-200 p-8 rounded-[32px] shadow-lg w-full max-w-sm mx-auto">
+    <div className="bg-gray-200 p-12 rounded-[38px] shadow-lg w-full max-w-sm mx-auto">
       <h2 className="text-2xl font-bold mb-6 text-center">Welcome Back!</h2>
       <form>
         <div className="mb-4">
@@ -39,9 +40,12 @@ const SignIn = () => {
           </a>
         </div>
         <div className="mt-4 text-center">
-          <button className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200">
-            Create an account
-          </button>
+        <Link
+            to="/signup"
+            className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200"
+          >Create an account
+          </Link>
+
         </div>
       </form>
     </div>
