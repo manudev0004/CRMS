@@ -1,10 +1,9 @@
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const connectDB = require('./db');
-const User = require('./models/User');
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const connectDB = require("./db");
+const User = require("./models/User");
 
 // Initialize express app
 const app = express();
@@ -14,53 +13,82 @@ app.use(cors());
 // Connect to MongoDB
 connectDB();
 
-// Secret key for JWT
-const JWT_SECRET = 'your_jwt_secret_key';
-
-// Registration route
-app.post('/signup', async (req, res) => {
-  const { username, email, password } = req.body;
+const handleSignup = async (req, res) => {
+  const { username, email, password, jobTitle, companyName, termsAccepted } =
+    req.body;
 
   try {
+    // Check if a user with the provided email already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ msg: 'User already exists' });
+      return res.status(400).json({ msg: "User already exists" });
     }
 
-    const user = new User({ username, email, password });
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new user with all the data from the frontend
+    const user = new User({
+      username,
+      email,
+      password: hashedPassword,
+      jobTitle,
+      companyName,
+      termsAccepted,
+    });
+
+    // Save the new user to the database
     await user.save();
 
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' });
-
-    res.status(201).json({ token, user: { id: user._id, username, email } });
+    res.status(201).json({
+      msg: "Signup successful",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        jobTitle: user.jobTitle,
+        companyName: user.companyName,
+      },
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error("Signup error:", error);
+    res.status(500).json({ error: "Server error", details: error.message });
   }
-});
+};
 
-// Login route
-app.post('/signin', async (req, res) => {
+// Function to handle sign-in
+const handleSignin = async (req, res) => {
   const { email, password } = req.body;
+
+  console.log("Signin request body:", req.body); // Log the incoming data for debugging
 
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ msg: 'User does not exist' });
+      return res.status(400).json({ msg: "User does not exist" });
     }
 
+    // Check if the password matches
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ msg: 'Invalid credentials' });
+      return res.status(400).json({ msg: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' });
-
-    res.json({ token, user: { id: user._id, username: user.username, email: user.email } });
+    res.json({
+      msg: "Signin successful",
+      user: { id: user._id, username: user.username, email: user.email },
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error("Signin error:", error);
+    res.status(500).json({ error: "Server error", details: error.message });
   }
-});
+};
 
-// Start server
+
+// Routes
+app.post("/signup", handleSignup);
+app.post("/signin", handleSignin);
+
+// Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

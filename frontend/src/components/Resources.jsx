@@ -1,52 +1,175 @@
-import React from 'react';
-import Sidebar from './Sidebar';
-const Card = ({ title, value }) => {
-  return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h3 className="text-sm text-gray-500 mb-2">{title}</h3>
-      <p className="text-2xl font-bold">{value}</p>
-    </div>
-  );
-};
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Sidebar from "./Sidebar";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+// import "./App.css";
 
-const Dashboard = () => {
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+const Resources = () => {
+  const [metrics, setMetrics] = useState(null);
+  const [chartData, setChartData] = useState(null);
+
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:8000/api/live-metrics/"
+        );
+        setMetrics(response.data);
+      } catch (error) {
+        console.error("Error fetching live metrics:", error);
+      }
+    };
+
+    const fetchChartData = async () => {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:8000/api/chart-data/"
+        );
+        setChartData(response.data);
+      } catch (error) {
+        console.error("Error fetching chart data:", error);
+      }
+    };
+
+    fetchMetrics();
+    fetchChartData();
+  }, []);
+
+  if (!metrics || !chartData) {
+    return <div>Loading...</div>;
+  }
+
+  const { cpu, memory, disk, uptime, bandwidth, cost_distribution } = metrics;
+
+  const lineChartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      title: { display: false },
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { display: false } },
+    },
+  };
+
+  const cardStyles =
+    "p-4 bg-white rounded-lg shadow-md flex flex-col justify-between items-start";
+
   return (
     <div className="flex">
       <Sidebar />
+      <div className="flex-grow p-6 bg-gray-100">
+        <h1 className="text-3xl font-bold mb-8">Resource Monitor</h1>
 
-      <div className="flex-grow bg-gray-50 p-10">
-        <h1 className="text-3xl font-bold mb-6">Resource Monitor</h1>
-        <p className="text-gray-500 mb-10">Welcome to CR Resource Manager. To get an overview of your cloud resource usage and costs.</p>
-
-        <h2 className="text-xl font-semibold mb-4">Current Project Key Metrics</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-          <Card title="Memory" value="1.5 GB" />
-          <Card title="CPU" value="30%" />
-          <Card title="Storage" value="1.5 TB" />
-          <Card title="Uptime" value="100%" />
-          <Card title="Bandwidth" value="500 Mbps" />
+        {/* Top Metrics */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className={cardStyles}>
+            <h2 className="text-xl font-semibold">Memory</h2>
+            <p className="text-3xl font-bold">{memory}</p>
+          </div>
+          <div className={cardStyles}>
+            <h2 className="text-xl font-semibold">CPU</h2>
+            <p className="text-3xl font-bold">{cpu}</p>
+          </div>
+          <div className={cardStyles}>
+            <h2 className="text-xl font-semibold">Storage</h2>
+            <p className="text-3xl font-bold">{disk.used}</p>
+            <p className="text-sm text-gray-500">Free: {disk.free}</p>
+          </div>
+          <div className={cardStyles}>
+            <h2 className="text-xl font-semibold">Bandwidth</h2>
+            <p className="text-3xl font-bold">{bandwidth.sent}</p>
+            <p className="text-sm text-gray-500">Received: {bandwidth.recv}</p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-sm text-gray-500 mb-2">Network Traffic</h3>
-            <p className="text-green-500 font-semibold mb-4">+5%</p>
-            {/* Placeholder  */}
-            <div className="h-24 bg-gray-200 rounded"></div>
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="p-6 bg-white rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-4">Network Traffic</h2>
+            <Line options={lineChartOptions} data={chartData} />
           </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-sm text-gray-500 mb-2">CPU Usage</h3>
-            <p className="text-green-500 font-semibold mb-4">+2%</p>
-            {/* Placeholder */}
-            <div className="h-24 bg-gray-200 rounded"></div>
+          <div className="p-6 bg-white rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-4">CPU Usage</h2>
+            <Line options={lineChartOptions} data={chartData} />
           </div>
+        </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-sm text-gray-500 mb-2">Bandwidth Comparison</h3>
-            <p className="text-green-500 font-semibold mb-4">+10%</p>
-            {/* Placeholder */}
-            <div className="h-24 bg-gray-200 rounded"></div>
+        {/* Cost Distribution & Disk Usage */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+          <div className="p-6 bg-white rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-4">Disk Usage</h2>
+            <div className="flex justify-between items-center">
+              <p className="text-lg font-semibold">Used: {disk.used}</p>
+              <p className="text-lg font-semibold">Free: {disk.free}</p>
+            </div>
+            <div className="mt-4 w-full bg-gray-200 rounded-full h-4">
+              <div
+                className="bg-blue-500 h-4 rounded-full"
+                style={{ width: `${disk.percent}` }}
+              ></div>
+            </div>
+          </div>
+          <div className="p-6 bg-white rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-4">Cost Distribution</h2>
+            <div>
+              <div className="mb-2">
+                <p className="text-sm">Storage: {cost_distribution.storage}%</p>
+                <div className="w-full bg-gray-200 rounded-full h-4">
+                  <div
+                    className="bg-green-500 h-4 rounded-full"
+                    style={{ width: `${cost_distribution.storage}%` }}
+                  ></div>
+                </div>
+              </div>
+              <div className="mb-2">
+                <p className="text-sm">Compute: {cost_distribution.compute}%</p>
+                <div className="w-full bg-gray-200 rounded-full h-4">
+                  <div
+                    className="bg-blue-500 h-4 rounded-full"
+                    style={{ width: `${cost_distribution.compute}%` }}
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm">
+                  Bandwidth: {cost_distribution.bandwidth}%
+                </p>
+                <div className="w-full bg-gray-200 rounded-full h-4">
+                  <div
+                    className="bg-yellow-500 h-4 rounded-full"
+                    style={{ width: `${cost_distribution.bandwidth}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="flex-grow p-4 bg-gray-100">
+          <div className={cardStyles}>
+            <h2 className="text-xl font-semibold">Uptime</h2>
+            <p className="text-3xl font-bold">{uptime}</p>
           </div>
         </div>
       </div>
@@ -54,4 +177,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Resources;
