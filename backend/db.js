@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// MongoDB connection string (replace <username>, <password>, and <dbname> with actual values)
 const MONGO_URI = 'mongodb://localhost:27017/authentication';
 
 const connectDB = async () => {
