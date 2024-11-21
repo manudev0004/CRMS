@@ -6,6 +6,9 @@ import {
   HardDrive,
   Server,
   Network,
+  Database,
+  Shield,
+  Users,
 } from "lucide-react";
 
 const iconMap = {
@@ -14,6 +17,9 @@ const iconMap = {
   HardDrive,
   Server,
   Network,
+  Database,
+  Shield,
+  Users,
 };
 
 const MetricCard = ({ icon: Icon, title, value }) => {
@@ -95,8 +101,28 @@ const Dashboard = () => {
             title="Bandwidth"
             value={`Sent: ${metrics.bandwidth.sent} | Received: ${metrics.bandwidth.recv}`}
           />
+          {/* New Cards for Databases, Instances, Firewall, and Users */}
+          <MetricCard
+            icon={iconMap.Database}
+            title="Databases"
+            value={`${metrics.databases} databases`}
+          />
+          <MetricCard
+            icon={iconMap.Server}
+            title="Instances"
+            value={`${metrics.instances} running instances`}
+          />
+          <MetricCard
+            icon={iconMap.Shield}
+            title="Firewall"
+            value={`Status: ${metrics.firewall} `}
+          />
+          <MetricCard
+            icon={iconMap.Users}
+            title="Users"
+            value={`${metrics.users} total users`}
+          />
         </div>
-
 
         <div className="mt-12 text-center">
           <a
