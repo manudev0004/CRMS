@@ -1,22 +1,20 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { UserContext } from "./UserContext";
 
 const Navbar = () => {
+  const { user, logout } = useContext(UserContext);
+
   return (
     <nav className="bg-white shadow-md py-4">
       <div className="container mx-auto flex justify-between items-center">
-        {/* Left side - Logo and title */}
         <div className="flex items-center">
-        <img src="crms.png" alt="logo" className="h-6 w-6 mr-2" />
-          <Link
-            to="/"
-          >
-            
+          <img src="crms.png" alt="logo" className="h-6 w-6 mr-2" />
+          <Link to="/">
             <span className="text-lg font-bold">CRMS</span>
           </Link>
         </div>
 
-        {/* Center - Navbar items */}
         <div className="flex space-x-6 text-gray-700">
           <a href="#projects" className="hover:underline">
             Projects
@@ -35,17 +33,25 @@ const Navbar = () => {
           </a>
         </div>
 
-        {/* Right side - Sign Up button */}
         <div>
-          <Link
-            to="/signup"
-            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-          >
-            Sign Up
-          </Link>
-          {/* <button className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
-            Sign Up
-          </button> */}
+          {user ? (
+            <>
+              <span className="mr-4">Hello, {user.username}</span>
+              <button
+                onClick={logout}
+                className="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/signin"
+              className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+            >
+              Sign In
+            </Link>
+          )}
         </div>
       </div>
     </nav>

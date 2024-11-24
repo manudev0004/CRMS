@@ -1,17 +1,19 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
+import { UserContext } from "./UserContext";
+
 
 const SignIn = () => {
-  const [username, setUsername] = useState(""); // This will be the email
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  const { setUser } = useContext(UserContext); // Moved to top-level of the component
   const history = useHistory();
 
   const handleSignIn = async (e) => {
     e.preventDefault();
-  
-    console.log("Attempting to sign in with:", { email: username, password }); // Log the sent data
-  
+
     try {
       const response = await fetch("http://localhost:5000/signin", {
         method: "POST",
@@ -20,12 +22,14 @@ const SignIn = () => {
         },
         body: JSON.stringify({ email: username, password }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
-        console.log("Sign-in successful:", data);
-        history.push("/dashboard"); // Redirect on success
+        setUser(data.user); // Set user globally via context
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        history.push("/dashboard");
       } else {
         setError(data.msg || "An error occurred during sign-in.");
       }
@@ -34,11 +38,10 @@ const SignIn = () => {
       setError("An unexpected error occurred.");
     }
   };
-  
 
   return (
     <div className="bg-gray-200 p-8 rounded-[38px] shadow-lg w-full max-w-sm mx-auto">
-      <h2 className="text-2xl font-bold mb-6 text-center">Welcome Back !</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center">Welcome Back!</h2>
       <form onSubmit={handleSignIn}>
         <div className="mb-4">
           <label className="block text-sm mb-2" htmlFor="username">
@@ -50,7 +53,7 @@ const SignIn = () => {
             placeholder="Enter your email"
             className="w-full p-3 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
             value={username}
-            onChange={(e) => setUsername(e.target.value)} // Capture email
+            onChange={(e) => setUsername(e.target.value)}
           />
         </div>
         <div className="mb-6">
@@ -63,7 +66,7 @@ const SignIn = () => {
             placeholder="Enter your password"
             className="w-full p-3 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
             value={password}
-            onChange={(e) => setPassword(e.target.value)} // Capture password
+            onChange={(e) => setPassword(e.target.value)}
           />
         </div>
         <button
@@ -72,10 +75,14 @@ const SignIn = () => {
         >
           Log in
         </button>
+        {error && <p className="text-red-600 mt-4">{error}</p>}
         <div className="mt-4 text-center">
-          <a href="#" className="text-sm text-blue-600 hover:underline">
+        <Link
+            to="/forgot-password"
+            className="text-sm text-blue-600 hover:underline"
+          >
             Forgot Password?
-          </a>
+          </Link>
         </div>
         <div className="mt-4 text-center">
           <Link

@@ -5,8 +5,8 @@ const CloudProviders = () => {
   const providers = [
     {
       name: "Amazon Web Services",
-      status: "Connected",
-      date: "12/31/2022",
+      status: "Not Connected",
+      date: null,
     },
     {
       name: "Google Cloud Platform",

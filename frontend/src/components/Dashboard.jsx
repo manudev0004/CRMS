@@ -34,8 +34,13 @@ const MetricCard = ({ icon: Icon, title, value }) => {
 
 const Dashboard = () => {
   const [metrics, setMetrics] = useState(null); // Start with null for better control
-
+  const [user, setUser] = useState(null);
   useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+
     const fetchMetrics = () => {
       axios
         .get("http://127.0.0.1:8000/api/live-metrics/")
@@ -62,7 +67,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-6">
       <div className="container mx-auto">
-        <h1 className="text-4xl font-bold mb-6">Welcome User!</h1>
+        <h1 className="text-4xl font-bold mb-6">Hello, {user?.username || "User"}!</h1>
         <p className="text-xl text-gray-600 mb-10">
           View and manage your cloud resources
         </p>
