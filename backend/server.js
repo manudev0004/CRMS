@@ -6,12 +6,21 @@ const connectDB = require("./db");
 const User = require("./models/User");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
+// const { google } = require("googleapis");
+// const bodyParser = require("body-parser");
+// const nodemailer = require("nodemailer");
 
 const SECRET_KEY = "d0aef898d12c20c85c43d11a38bd1e7e9e7b96bd7e07a8034b18b0c776c8f223";
 
+// Google API Credentials
+const CLIENT_ID = "82946541954-djchuflfcbumvl9b9cjdscdij2ip9mn4.apps.googleusercontent.com";
+const CLIENT_SECRET = "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";
+const REDIRECT_URI = "https://developers.google.com/oauthplayground"; // Or your redirect URI
+const REFRESH_TOKEN = "1//0469N2OsmPf4WCgYIARAAGAQSNwF-L9IrZaue12yQIRK7-jifw82j4eBBbpFzTSc0xEhDsaPiQO4E1FHSgCIWHn09bQtLq0YGEKU";
+
 // Initialize express app
 const app = express();
+// app.use(bodyParser.json());
 app.use(express.json());
 app.use(cors());
 
@@ -19,13 +28,13 @@ app.use(cors());
 connectDB();
 
 // Configure Nodemailer
-const transporter = nodemailer.createTransport({
-  service: "Gmail", // Use your email provider (e.g., Gmail, Outlook)
-  auth: {
-    user: "your-email@gmail.com",
-    pass: "your-email-password",
-  },
-});
+// const transporter = nodemailer.createTransport({
+//   service: "Gmail", // Use your email provider (e.g., Gmail, Outlook)
+//   auth: {
+//     user: "your-email@gmail.com",
+//     pass: "your-email-password",
+//   },
+// });
 
 const handleSignup = async (req, res) => {
   const { username, email, password, jobTitle, companyName, termsAccepted } =
@@ -103,6 +112,44 @@ const handleSignin = async (req, res) => {
   }
 };
 
+// // Configure OAuth2 Client
+// const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+// oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+
+// // Function to send emails using Gmail API
+// const sendPasswordResetEmail = async (to, resetLink) => {
+//   try {
+//     const accessToken = await oAuth2Client.getAccessToken();
+
+//     const transporter = require("nodemailer").createTransport({
+//       service: "gmail",
+//       auth: {
+//         type: "OAuth2",
+//         user: "your-email@gmail.com", // Your Gmail account
+//         clientId: CLIENT_ID,
+//         clientSecret: CLIENT_SECRET,
+//         refreshToken: REFRESH_TOKEN,
+//         accessToken: accessToken.token,
+//       },
+//     });
+
+//     const mailOptions = {
+//       from: "Your App <your-email@gmail.com>",
+//       to,
+//       subject: "Password Reset Request",
+//       text: `You requested a password reset. Use the following link to reset your password: ${resetLink}`,
+//       html: `<p>You requested a password reset. Use the following link to reset your password:</p><a href="${resetLink}">Reset Password</a>`,
+//     };
+
+//     const result = await transporter.sendMail(mailOptions);
+//     console.log("Password reset email sent:", result);
+//     return result;
+//   } catch (error) {
+//     console.error("Error sending email:", error);
+//     throw error;
+//   }
+// };
+
 // Middleware to authenticate JWT
 const authenticateToken = (req, res, next) => {
   const token = req.headers["authorization"];
@@ -140,15 +187,9 @@ app.post("/forgot-password", async (req, res) => {
     // Generate a reset token
     const resetToken = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
 
-    // Send email
+    // Send email with Gmail API
     const resetLink = `http://localhost:3000/reset-password/${resetToken}`;
-    const mailOptions = {
-      to: email,
-      subject: "Password Reset Request",
-      text: `You requested a password reset. Click here to reset your password: ${resetLink}`,
-    };
-
-    await transporter.sendMail(mailOptions);
+    await sendPasswordResetEmail(email, resetLink);
 
     res.json({ msg: "Password reset email sent. Please check your inbox." });
   } catch (error) {

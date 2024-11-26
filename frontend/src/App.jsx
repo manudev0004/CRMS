@@ -15,6 +15,10 @@ import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
 import CostManagement from "./components/CostManagement";
 import CloudProviders from "./components/CloudProviders";
+import Products from "./components/Marketplace";
+import APIandServices from "./components/Api";
+import Projects from "./components/Projects";
+import Billing from "./components/Billing";
 import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
@@ -28,6 +32,10 @@ function App() {
             <Switch>
               <Route path="/signup" component={Signup} />
               <Route path="/" exact component={HomePage} />
+              <Route path="/marketplace" exact component={Products} />
+              <Route path="/api" exact component={APIandServices} />
+              <Route path="/projects" exact component={Projects} />
+              <Route path="/billing" exact component={Billing} />
               <Route path="/forgot-password" component={ForgotPassword} />
               <Route path="/reset-password/:token" component={ResetPassword} />
 

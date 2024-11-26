@@ -16,21 +16,18 @@ const Navbar = () => {
         </div>
 
         <div className="flex space-x-6 text-gray-700">
-          <a href="#projects" className="hover:underline">
-            Projects
-          </a>
-          <a href="#apis" className="hover:underline">
-            APIs & Services
-          </a>
-          <a href="#billing" className="hover:underline">
-            Billing
-          </a>
-          <a href="#iam" className="hover:underline">
-            Admin
-          </a>
-          <a href="#marketplace" className="hover:underline">
-            Marketplace
-          </a>
+          <Link to="/projects">
+            <span className="hover:underline">Projects</span>
+          </Link>
+          <Link to="/api">
+            <span className="hover:underline">APIs & Services</span>
+          </Link>
+          <Link to="/billing">
+            <span className="hover:underline">Billing</span>
+          </Link>
+          <Link to="/marketplace">
+            <span className="hover:underline">Marketplace</span>
+          </Link>
         </div>
 
         <div>
