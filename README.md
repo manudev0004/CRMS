@@ -52,23 +52,6 @@ Welcome to the **Cloud Resource Management System (CRMS)** GitHub repository! Th
 4. **Access**:
    Open your browser and navigate to `http://localhost:3000` for the frontend and `http://localhost:8000` for the backend.
 
----
-
-## Pages Overview 📸
-
-### 1. Sign-Up Page 📝
-![Sign-Up Page](https://your-image-link/sign-up-page.png)
-
-### 2. Login Page 🔐
-![Login Page](https://your-image-link/login-page.png)
-
-### 3. Dashboard 📊
-![Dashboard](https://your-image-link/dashboard.png)
-
-### 4. Resource Management 🌐
-![Resource Management](https://your-image-link/resource-management.png)
-
----
 
 ## How It Works ⚙️
 
